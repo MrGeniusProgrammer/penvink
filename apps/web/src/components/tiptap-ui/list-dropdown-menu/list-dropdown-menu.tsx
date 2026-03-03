@@ -1,51 +1,52 @@
-import { useCallback, useState } from "react"
-import { type Editor } from "@tiptap/react"
+import { useCallback, useState } from "react";
+import { type Editor } from "@tiptap/react";
 
 // --- Hooks ---
-import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
+import { useTiptapEditor } from "@/hooks/use-tiptap-editor";
 
 // --- Icons ---
-import { ChevronDownIcon } from "@/components/tiptap-icons/chevron-down-icon"
+import { ChevronDownIcon } from "@/components/tiptap-icons/chevron-down-icon";
 
 // --- Tiptap UI ---
-import { ListButton, type ListType } from "@/components/tiptap-ui/list-button"
+import { ListButton, type ListType } from "@/components/tiptap-ui/list-button";
 
-import { useListDropdownMenu } from "@/components/tiptap-ui/list-dropdown-menu/use-list-dropdown-menu"
+import { useListDropdownMenu } from "@/components/tiptap-ui/list-dropdown-menu/use-list-dropdown-menu";
 
 // --- UI Primitives ---
-import type { ButtonProps } from "@/components/tiptap-ui-primitive/button"
-import { Button, ButtonGroup } from "@/components/tiptap-ui-primitive/button"
+import type { ButtonShortcutProps } from "@/components/ui/button-shortcut";
+import { ButtonShortcut } from "@/components/ui/button-shortcut";
+import { ButtonGroup } from "@/components/ui/button-group";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from "@/components/tiptap-ui-primitive/dropdown-menu"
-import { Card, CardBody } from "@/components/tiptap-ui-primitive/card"
+} from "@/components/ui/dropdown-menu";
+import { Card, CardContent } from "@/components/ui/card";
 
-export interface ListDropdownMenuProps extends Omit<ButtonProps, "type"> {
+export interface ListDropdownMenuProps extends Omit<ButtonShortcutProps, "type"> {
   /**
    * The Tiptap editor instance.
    */
-  editor?: Editor
+  editor?: Editor;
   /**
    * The list types to display in the dropdown.
    */
-  types?: ListType[]
+  types?: ListType[];
   /**
    * Whether the dropdown should be hidden when no list types are available
    * @default false
    */
-  hideWhenUnavailable?: boolean
+  hideWhenUnavailable?: boolean;
   /**
    * Callback for when the dropdown opens or closes
    */
-  onOpenChange?: (isOpen: boolean) => void
+  onOpenChange?: (isOpen: boolean) => void;
   /**
    * Whether to render the dropdown menu in a portal
    * @default false
    */
-  portal?: boolean
+  portal?: boolean;
 }
 
 export function ListDropdownMenu({
@@ -56,68 +57,69 @@ export function ListDropdownMenu({
   portal = false,
   ...props
 }: ListDropdownMenuProps) {
-  const { editor } = useTiptapEditor(providedEditor)
-  const [isOpen, setIsOpen] = useState(false)
+  const { editor } = useTiptapEditor(providedEditor);
+  const [isOpen, setIsOpen] = useState(false);
 
-  const { filteredLists, canToggle, isActive, isVisible, Icon } =
-    useListDropdownMenu({
-      editor,
-      types,
-      hideWhenUnavailable,
-    })
+  const { filteredLists, canToggle, isActive, isVisible, Icon } = useListDropdownMenu({
+    editor,
+    types,
+    hideWhenUnavailable,
+  });
 
   const handleOnOpenChange = useCallback(
     (open: boolean) => {
-      setIsOpen(open)
-      onOpenChange?.(open)
+      setIsOpen(open);
+      onOpenChange?.(open);
     },
-    [onOpenChange]
-  )
+    [onOpenChange],
+  );
 
   if (!isVisible) {
-    return null
+    return null;
   }
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={handleOnOpenChange}>
-      <DropdownMenuTrigger asChild>
-        <Button
-          type="button"
-          variant="ghost"
-          data-active-state={isActive ? "on" : "off"}
-          role="button"
-          tabIndex={-1}
-          disabled={!canToggle}
-          data-disabled={!canToggle}
-          aria-label="List options"
-          tooltip="List"
-          {...props}
-        >
-          <Icon className="tiptap-button-icon" />
-          <ChevronDownIcon className="tiptap-button-dropdown-small" />
-        </Button>
-      </DropdownMenuTrigger>
+      <DropdownMenuTrigger
+        render={
+          <ButtonShortcut
+            type="button"
+            variant="ghost"
+            data-active-state={isActive ? "on" : "off"}
+            role="button"
+            tabIndex={-1}
+            disabled={!canToggle}
+            data-disabled={!canToggle}
+            aria-label="List options"
+            tooltip="List"
+            {...props}
+          >
+            <Icon className="tiptap-button-icon" />
+            <ChevronDownIcon className="tiptap-button-dropdown-small" />
+          </ButtonShortcut>
+        }
+      />
 
-      <DropdownMenuContent align="start" portal={portal}>
-        <Card>
-          <CardBody>
-            <ButtonGroup>
-              {filteredLists.map((option) => (
-                <DropdownMenuItem key={option.type} asChild>
-                  <ListButton
-                    editor={editor}
-                    type={option.type}
-                    text={option.label}
-                    showTooltip={false}
-                  />
-                </DropdownMenuItem>
-              ))}
-            </ButtonGroup>
-          </CardBody>
-        </Card>
+      <DropdownMenuContent align="start">
+        <ButtonGroup className="flex flex-col w-full">
+          {filteredLists.map((option) => (
+            <DropdownMenuItem
+              key={option.type}
+              render={
+                <ListButton
+                  editor={editor}
+                  type={option.type}
+                  text={option.label}
+                  showTooltip={false}
+                  className={"justify-start"}
+                />
+              }
+            />
+          ))}
+        </ButtonGroup>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }
 
-export default ListDropdownMenu
+export default ListDropdownMenu;
