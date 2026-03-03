@@ -1,0 +1,3 @@
+{
+  "extends": "@penvink/config/tsconfig.base.json"
+}

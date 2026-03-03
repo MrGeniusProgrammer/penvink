@@ -1,0 +1,24 @@
+{
+  "name": "@penvink/auth",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@penvink/db": "workspace:*",
+    "@penvink/env": "workspace:*",
+    "better-auth": "catalog:",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@penvink/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "name": "penvink",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "check-types": "turbo check-types",
+    "dev:native": "turbo -F native dev",
+    "dev:web": "turbo -F web dev",
+    "dev:server": "turbo -F server dev",
+    "db:push": "turbo -F @penvink/db db:push",
+    "db:studio": "turbo -F @penvink/db db:studio",
+    "db:generate": "turbo -F @penvink/db db:generate",
+    "db:migrate": "turbo -F @penvink/db db:migrate",
+    "check": "oxlint && oxfmt --write"
+  },
+  "dependencies": {
+    "@penvink/env": "workspace:*",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@penvink/config": "workspace:*",
+    "@types/node": "catalog:",
+    "oxfmt": "^0.26.0",
+    "oxlint": "^1.41.0",
+    "turbo": "^2.6.3",
+    "typescript": "catalog:"
+  },
+  "packageManager": "pnpm@10.28.2"
+}
