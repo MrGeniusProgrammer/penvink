@@ -12,16 +12,28 @@ import { Typography } from "@tiptap/extension-typography";
 import { Highlight } from "@tiptap/extension-highlight";
 import { Subscript } from "@tiptap/extension-subscript";
 import { Superscript } from "@tiptap/extension-superscript";
-import { Selection } from "@tiptap/extensions";
+import { TableKit } from "@tiptap/extension-table";
+import {
+  Selection,
+  CharacterCount,
+  Dropcursor,
+  TrailingNode,
+  Placeholder,
+} from "@tiptap/extensions";
 
 // --- UI Primitives ---
 import { ButtonShortcut } from "@/components/ui/button-shortcut";
 import { Separator } from "@/components/ui/separator";
-import { Toolbar, ToolbarGroup, ToolbarSeparator } from "@/components/tiptap-ui-primitive/toolbar";
+import {
+  Toolbar,
+  ToolbarGroup,
+  ToolbarSeparator,
+} from "@/components/tiptap-ui-primitive/toolbar";
 
 // --- Tiptap Node ---
 import { ImageUploadNode } from "@/components/tiptap-node/image-upload-node/image-upload-node-extension";
 import { HorizontalRule } from "@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node-extension";
+import "@/components/tiptap-node/table-node/table-node.scss";
 import "@/components/tiptap-node/blockquote-node/blockquote-node.scss";
 import "@/components/tiptap-node/code-block-node/code-block-node.scss";
 import "@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node.scss";
@@ -35,16 +47,22 @@ import { HeadingDropdownMenu } from "@/components/tiptap-ui/heading-dropdown-men
 import { ImageUploadButton } from "@/components/tiptap-ui/image-upload-button";
 import { ListDropdownMenu } from "@/components/tiptap-ui/list-dropdown-menu";
 import { BlockquoteButton } from "@/components/tiptap-ui/blockquote-button";
+import { TableButton } from "@/components/tiptap-ui/table-button";
 import { CodeBlockButton } from "@/components/tiptap-ui/code-block-button";
 import {
   ColorHighlightPopover,
   ColorHighlightPopoverContent,
   ColorHighlightPopoverButton,
 } from "@/components/tiptap-ui/color-highlight-popover";
-import { LinkPopover, LinkContent, LinkButton } from "@/components/tiptap-ui/link-popover";
+import {
+  LinkPopover,
+  LinkContent,
+  LinkButton,
+} from "@/components/tiptap-ui/link-popover";
 import { MarkButton } from "@/components/tiptap-ui/mark-button";
 import { TextAlignButton } from "@/components/tiptap-ui/text-align-button";
 import { UndoRedoButton } from "@/components/tiptap-ui/undo-redo-button";
+import { TableBubbleMenu } from "@/components/tiptap-ui/table-bubble-menu";
 
 // --- Icons ---
 import { ArrowLeftIcon } from "@/components/tiptap-icons/arrow-left-icon";
@@ -84,7 +102,10 @@ const MainToolbarContent = ({
       <Separator orientation="vertical" />
 
       <HeadingDropdownMenu levels={[1, 2, 3, 4]} portal={isMobile} />
-      <ListDropdownMenu types={["bulletList", "orderedList", "taskList"]} portal={isMobile} />
+      <ListDropdownMenu
+        types={["bulletList", "orderedList", "taskList"]}
+        portal={isMobile}
+      />
       <BlockquoteButton />
       <CodeBlockButton />
 
@@ -120,6 +141,10 @@ const MainToolbarContent = ({
 
       <Separator orientation="vertical" />
 
+      <TableButton />
+
+      <Separator orientation="vertical" />
+
       <ModeToggle />
     </>
   );
@@ -142,13 +167,19 @@ const MobileToolbarContent = ({
       )}
     </ButtonShortcut>
 
-    {type === "highlighter" ? <ColorHighlightPopoverContent /> : <LinkContent />}
+    {type === "highlighter" ? (
+      <ColorHighlightPopoverContent />
+    ) : (
+      <LinkContent />
+    )}
   </>
 );
 
 export function SimpleEditor() {
   const isMobile = useIsBreakpoint();
-  const [mobileView, setMobileView] = useState<"main" | "highlighter" | "link">("main");
+  const [mobileView, setMobileView] = useState<"main" | "highlighter" | "link">(
+    "main",
+  );
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -168,7 +199,11 @@ export function SimpleEditor() {
           openOnClick: false,
           enableClickSelection: true,
         },
+        trailingNode: {
+          node: "paragraph",
+        },
       }),
+      TableKit.configure({}),
       HorizontalRule,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       TaskList,
@@ -186,6 +221,10 @@ export function SimpleEditor() {
         upload: handleImageUpload,
         onError: (error) => console.error("Upload failed:", error),
       }),
+      Placeholder.configure({
+        placeholder: "Write something...",
+      }),
+      CharacterCount,
     ],
     content,
   });
@@ -216,7 +255,13 @@ export function SimpleEditor() {
           </div>
         </div>
 
-        <EditorContent editor={editor} role="presentation" className="simple-editor-content" />
+        <TableBubbleMenu providedEditor={editor} />
+
+        <EditorContent
+          editor={editor}
+          role="presentation"
+          className="simple-editor-content"
+        />
       </EditorContext.Provider>
     </div>
   );
